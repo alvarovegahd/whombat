@@ -10,19 +10,19 @@ import type {
 export const MAX_SAMPLERATE = 500_000;
 export const MIN_SAMPLERATE = 4000;
 export const MIN_DB = -140;
-export const DEFAULT_WINDOW_SIZE = 0.025;
-export const DEFAULT_OVERLAP = 0.5;
+export const DEFAULT_WINDOW_SIZE = 0.027;
+export const DEFAULT_OVERLAP = 0.8;
 export const DEFAULT_WINDOW = "hann";
 export const DEFAULT_SCALE = "dB";
 export const DEFAULT_FILTER_ORDER = 5;
-export const DEFAULT_CMAP = "gray";
+export const DEFAULT_CMAP = "plasma";
 
 /* Restrictions on the settings for the STFT computation
  * These are to prevent the user from setting parameters that
  * would cause the STFT to fail or be too slow
  */
-export const MAX_FFT_SIZE = 2 ** 13;
-export const MIN_FFT_SIZE = 2 ** 7;
+export const MAX_FFT_SIZE = 2 ** 11;
+export const MIN_FFT_SIZE = 2 ** 4;
 export const MAX_HOP_FRACTION = 1; // 100% of window size
 export const MIN_HOP_FRACTION = 0.1; // 10% of window size
 

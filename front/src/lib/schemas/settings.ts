@@ -96,6 +96,7 @@ export const COLORMAPS = [
   "cool",
   "cubehelix",
   "twilight",
+  "jet",
 ] as const;
 
 export const SpectrogramSettingsSchema = z.object({
