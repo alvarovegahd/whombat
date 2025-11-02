@@ -1,15 +1,11 @@
 import { type Control, Controller } from "react-hook-form";
 
+import LogSlider from "@/lib/components/inputs/LogSlider";
 import Select from "@/lib/components/inputs/Select";
 import Slider from "@/lib/components/inputs/Slider";
 import { Group } from "@/lib/components/inputs/index";
 
-import {
-  MAX_FFT_SIZE,
-  MAX_HOP_FRACTION,
-  MIN_FFT_SIZE,
-  MIN_HOP_FRACTION,
-} from "@/lib/constants";
+import { MAX_HOP_FRACTION, MIN_HOP_FRACTION } from "@/lib/constants";
 import type { SpectrogramSettings } from "@/lib/types";
 
 import SettingsSection from "./SettingsSection";
@@ -40,6 +36,53 @@ const SPECTROGRAM_WINDOWS: Record<
   barthann: { id: "barthann", value: "barthann", label: "Bartlett-Hann" },
 };
 
+function WindowSize({
+  control,
+  samplerate,
+}: {
+  control: Control<SpectrogramSettings>;
+  samplerate: number;
+}) {
+  return (
+    <Controller
+      name="window_size"
+      control={control}
+      render={({ field, fieldState }) => (
+        <Group
+          name="windowSize"
+          label="Window size"
+          help="Select the size of the window used for the STFT, in seconds. The slider is logarithmic."
+          error={fieldState.error?.message}
+        >
+          <LogSlider
+            formatter={(value) => {
+              let samples = Math.round(Math.pow(2, value));
+              let seconds = samples / samplerate;
+              return `${seconds.toFixed(6)} seconds (${samples} samples)`;
+            }}
+            base={2}
+            label="Window size"
+            defaultValue={Math.log2(field.value * samplerate)}
+            onChangeEnd={(value) => {
+              if (typeof value !== "number") {
+                let seconds = value.map((v) => v / samplerate);
+                field.onChange(seconds);
+                return;
+              }
+
+              let seconds = value / samplerate;
+              field.onChange(seconds);
+            }}
+            minValue={4}
+            maxValue={13}
+            step={0.2}
+          />
+        </Group>
+      )}
+    />
+  );
+}
+
 export default function STFTSettings({
   samplerate,
   control,
@@ -49,27 +92,7 @@ export default function STFTSettings({
 }) {
   return (
     <SettingsSection>
-      <Controller
-        name="window_size"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Group
-            name="windowSize"
-            label="Window size"
-            help="Select the size of the window used for the STFT, in seconds."
-            error={fieldState.error?.message}
-          >
-            <Slider
-              label="Window size"
-              value={field.value}
-              onChange={field.onChange}
-              minValue={MIN_FFT_SIZE / samplerate}
-              maxValue={MAX_FFT_SIZE / samplerate}
-              step={0.001}
-            />
-          </Group>
-        )}
-      />
+      <WindowSize control={control} samplerate={samplerate} />
       <Controller
         name="overlap"
         control={control}
@@ -83,7 +106,7 @@ export default function STFTSettings({
             <Slider
               label="Overlap fraction"
               value={field.value}
-              onChange={field.onChange}
+              onChangeEnd={field.onChange}
               minValue={MIN_HOP_FRACTION}
               maxValue={MAX_HOP_FRACTION}
               step={0.01}
