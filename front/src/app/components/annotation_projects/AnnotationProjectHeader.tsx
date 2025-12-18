@@ -5,7 +5,6 @@ import {
 } from "next/navigation";
 
 import {
-  ClipsIcon,
   DatasetIcon,
   EditIcon,
   TagsIcon,
