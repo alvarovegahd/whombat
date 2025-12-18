@@ -4,9 +4,10 @@ from uuid import UUID
 from soundevent.io.aoef import AnnotationProjectObject
 from soundevent.io.aoef.annotation_task import AnnotationTaskObject
 from sqlalchemy import insert, tuple_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from whombat import models
+from whombat import exceptions, models
 from whombat.api.common import create_objects_without_duplicates
 from whombat.api.io.aoef.common import get_mapping
 
@@ -132,8 +133,15 @@ async def _create_annotation_tasks(
     if not values:
         return mapping
 
-    stmt = insert(models.AnnotationTask).values(values)
-    await session.execute(stmt)
+    try:
+        stmt = insert(models.AnnotationTask).values(values)
+        await session.execute(stmt)
+    except IntegrityError as e:
+        raise exceptions.DataIntegrityError(
+            "Failed to create annotation tasks because multiple tasks share "
+            "the same clip and/or UUID, likely due to duplicates in the "
+            "imported file."
+        ) from e
 
     # Get the IDs of the newly created annotations.
     created = await get_mapping(
