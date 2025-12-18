@@ -24,7 +24,10 @@ async def not_found_error_handler(_, exc: exceptions.NotFoundError):
     """
     return JSONResponse(
         status_code=404,
-        content={"message": str(exc)},
+        content={
+            "error_type": "NotFoundError",
+            "message": str(exc),
+        },
     )
 
 
@@ -47,7 +50,10 @@ async def duplicate_object_error_handler(
     """
     return JSONResponse(
         status_code=409,
-        content={"message": str(exc)},
+        content={
+            "error_type": "DuplicateObjectError",
+            "message": str(exc),
+        },
     )
 
 
@@ -71,7 +77,40 @@ async def data_integrity_error_handler(
     """
     return JSONResponse(
         status_code=409,
-        content={"message": str(exc)},
+        content={
+            "error_type": "DataIntegrityError",
+            "message": str(exc),
+        },
+    )
+
+
+async def data_format_error_handler(
+    _,
+    exc: exceptions.DataFormatError,
+):
+    """Handle data format errors.
+
+    Parameters
+    ----------
+    _ : Request
+        The request that caused the exception (unused).
+    exc : exceptions.DataFormatError
+        The exception that was raised.
+
+    Returns
+    -------
+    JSONResponse
+        A JSON response with a 400 status code and an error message.
+    """
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error_type": "DataFormatError",
+            "message": str(exc),
+            "format": exc.format,
+            "name": exc.name,
+            "details": exc.details,
+        },
     )
 
 
@@ -91,4 +130,7 @@ def add_error_handlers(app: FastAPI, settings: Settings):
     )
     app.exception_handler(exceptions.DataIntegrityError)(
         data_integrity_error_handler
+    )
+    app.exception_handler(exceptions.DataFormatError)(
+        data_format_error_handler
     )

@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import BinaryIO
 
+from pydantic import ValidationError
 from soundevent.io import aoef
 from sqlalchemy import tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,7 +44,20 @@ async def import_dataset(
         )
 
     data = obj["data"]
-    dataset_object = aoef.DatasetObject.model_validate(data)
+
+    try:
+        dataset_object = aoef.DatasetObject.model_validate(data)
+    except ValidationError as error:
+        name = getattr(src, "name", None)
+        raise exceptions.DataFormatError(
+            message=(
+                "Invalid dataset object provided. Please check the "
+                "provided file."
+            ),
+            format="aoef-dataset",
+            details=str(error),
+            name=name,
+        ) from error
 
     tags = await import_tags(session, dataset_object.tags or [])
 
