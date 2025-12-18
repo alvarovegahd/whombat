@@ -15,11 +15,7 @@ export default function ErrorToast({
     <div className="flex flex-col gap-2">
       <div>{message}</div>
       <div className="flex gap-3">
-        <Button
-          onClick={() => onShowDetails?.()}
-          mode="text"
-          padding="p-1"
-        >
+        <Button onClick={() => onShowDetails?.()} mode="text" padding="p-1">
           Show Details
         </Button>
         <Button
