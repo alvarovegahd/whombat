@@ -55,6 +55,13 @@ export default function AnnotationProgress({
     total,
   } = useMemo(() => computeAnnotationTasksProgress(tasks), [tasks]);
 
+  let currentTask = useMemo(() => {
+    if (current == null) {
+      return null;
+    }
+    return tasks[current];
+  }, [current, tasks]);
+
   return (
     <div className="inline-flex gap-1 items-center w-full h-full">
       <Tooltip
@@ -74,6 +81,21 @@ export default function AnnotationProgress({
       </Tooltip>
       <div className="inline-flex gap-4 items-center px-2 h-full rounded-lg border grow dark:border-stone-800">
         <div className="inline-flex gap-3 items-center">
+          <div className="inline-flex gap-1 items-center">
+            Current Task:{" "}
+            {currentTask != null ? (
+              <Button
+                variant="info"
+                mode="text"
+                onClick={() => {
+                  // copy uuid to clipboard
+                  navigator.clipboard.writeText(currentTask.uuid);
+                }}
+              >
+                {currentTask.uuid}
+              </Button>
+            ) : null}
+          </div>
           <ShortcutHelper shortcuts={SHORTCUTS} />
           <Dialog
             mode="text"
