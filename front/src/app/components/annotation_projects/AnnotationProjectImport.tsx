@@ -1,4 +1,3 @@
-import { Portal } from "@headlessui/react";
 import { useMutation } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useCallback, useState } from "react";
@@ -10,6 +9,7 @@ import { copyErrorToClipboard } from "@/app/lib/errors";
 import AnnotationProjectImportBase from "@/lib/components/annotation_projects/AnnotationProjectImport";
 import ErrorModal from "@/lib/components/ui/ErrorModal";
 import ErrorToast from "@/lib/components/ui/ErrorToast";
+import Portal from "@/lib/components/ui/Portal";
 
 import type { AnnotationProject, AnnotationProjectImport } from "@/lib/types";
 

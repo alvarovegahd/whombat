@@ -3,12 +3,12 @@ import json
 from pathlib import Path
 from typing import BinaryIO
 
-from soundevent.io import aoef
-from soundevent.io.aoef import AnnotationProjectObject
+from pydantic import ValidationError
+from soundevent.io.aoef import AnnotationProjectObject, AOEFObject
 from sqlalchemy import select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from whombat import models
+from whombat import exceptions, models
 from whombat.api.common import utils
 from whombat.api.io.aoef.annotation_tasks import get_annotation_tasks
 from whombat.api.io.aoef.clip_annotations import get_clip_annotations
@@ -37,25 +37,39 @@ async def import_annotation_project(
     else:
         data = json.loads(src.read())
 
-    if not isinstance(data, dict):
-        raise TypeError(f"Expected dict, got {type(data)}")
+    try:
+        obj = AOEFObject.model_validate(data)
+    except ValidationError as e:
+        raise exceptions.DataFormatError(
+            message=(
+                "Invalid Annotation Project file. "
+                "Expected a JSON file in AOEF format."
+            ),
+            format="aoef",
+            details=str(e),
+        ) from e
 
-    if "data" not in data:
-        raise ValueError("Missing 'data' key")
+    if obj.data.collection_type != "annotation_project":
+        raise exceptions.DataFormatError(
+            message=(
+                "Invalid Annotation Project file. "
+                "The provided file is a valid AOEF object, but it is not an "
+                "Annotation Project. Detected object type: "
+                f"'{obj.data.collection_type}'. "
+                "Please ensure you provided the correct file or convert it "
+                "to an Annotation Project."
+            ),
+            format="aoef-annotation-project",
+        )
 
-    obj = aoef.AnnotationProjectObject.model_validate(data["data"])
-
-    project = await get_or_create_annotation_project(session, obj)
-
-    tags = await import_tags(session, obj.tags or [])
-
-    users = await import_users(session, obj.users or [])
-
-    feature_names = await get_feature_names(session, obj)
-
+    imported_data = obj.data
+    project = await get_or_create_annotation_project(session, imported_data)
+    tags = await import_tags(session, imported_data.tags or [])
+    users = await import_users(session, imported_data.users or [])
+    feature_names = await get_feature_names(session, imported_data)
     recordings = await get_recordings(
         session,
-        obj,
+        imported_data,
         tags=tags,
         users=users,
         feature_names=feature_names,
@@ -63,58 +77,50 @@ async def import_annotation_project(
         base_audio_dir=base_audio_dir,
         should_import=False,
     )
-
     clips = await get_clips(
         session,
-        obj,
+        imported_data,
         recordings=recordings,
         feature_names=feature_names,
     )
-
     sound_events = await get_sound_events(
         session,
-        obj,
+        imported_data,
         recordings=recordings,
         feature_names=feature_names,
     )
-
     clip_annotations = await get_clip_annotations(
         session,
-        obj,
+        imported_data,
         clips=clips,
         users=users,
         tags=tags,
         user=imported_by,
     )
-
     await get_sound_event_annotations(
         session,
-        obj,
+        imported_data,
         sound_events=sound_events,
         clip_annotations=clip_annotations,
         users=users,
         tags=tags,
         user=imported_by,
     )
-
     await get_annotation_tasks(
         session,
-        obj,
+        imported_data,
         clips=clips,
         annotation_projects={project.uuid: project.id},
         users=users,
         clip_annotations=clip_annotations,
     )
-
     await add_annotation_tags(
         session,
-        obj,
+        imported_data,
         project.id,
         tags,
     )
-
     session.expire(project, ["tags"])
-
     return project
 
 
