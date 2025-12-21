@@ -138,9 +138,9 @@ async def _create_annotation_tasks(
         await session.execute(stmt)
     except IntegrityError as e:
         raise exceptions.DataIntegrityError(
-            "Failed to create annotation tasks because multiple tasks share "
-            "the same clip and/or UUID, likely due to duplicates in the "
-            "imported file."
+            "Duplicated tasks: Failed to create annotation tasks because "
+            "multiple tasks share the same clip and/or UUID, likely due "
+            "to duplicates in the imported file."
         ) from e
 
     # Get the IDs of the newly created annotations.

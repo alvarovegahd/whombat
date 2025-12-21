@@ -93,7 +93,7 @@ class TestExportAnnotationProject:
         assert response.status_code == 200
 
 
-class TestAnnotationImport:
+class TestAnnotationProjectImport:
     def test_can_import_annotation_project(
         self,
         client: TestClient,
@@ -156,7 +156,7 @@ class TestAnnotationImport:
         )
         assert response.status_code == 200
 
-    def test_import_fails_with_invalid_aoef_format(
+    def test_fails_with_invalid_aoef_format(
         self,
         client: TestClient,
         cookies: dict[str, str],
@@ -174,7 +174,7 @@ class TestAnnotationImport:
             "Expected a JSON file in AOEF format" in response.json()["message"]
         )
 
-    def test_import_fails_when_aoef_collection_type_is_mismatched(
+    def test_fails_when_aoef_collection_type_is_mismatched(
         self,
         client: TestClient,
         cookies: dict[str, str],
@@ -203,3 +203,35 @@ class TestAnnotationImport:
         )
         assert response.status_code == 400
         assert "Detected object type: 'dataset'" in response.json()["message"]
+
+    def test_fails_if_duplicated_tasks_are_present(
+        self,
+        client: TestClient,
+        cookies: dict[str, str],
+        recording: schemas.Recording,
+    ) -> None:
+        rec = data.Recording.model_validate(recording.model_dump())
+        clip = data.Clip(
+            recording=rec,
+            start_time=0,
+            end_time=1,
+        )
+
+        task = data.AnnotationTask(clip=clip)
+
+        project = data.AnnotationProject(
+            name="test_project",
+            description="test_description",
+            tasks=[task, task],
+        )
+
+        file = BytesIO()
+        file.write(aoef.to_aeof(project).model_dump_json().encode("utf-8"))
+
+        response = client.post(
+            "/api/v1/annotation_projects/import/",
+            files={"annotation_project": file},
+            cookies=cookies,
+        )
+        assert response.status_code == 409
+        assert "Duplicated tasks" in response.json()["message"]
