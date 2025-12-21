@@ -23,15 +23,36 @@ async def import_dataset(
 ) -> models.Dataset:
     if isinstance(src, (Path, str)):
         with open(src, "r") as file:
-            obj = json.load(file)
+            data = json.load(file)
     else:
-        obj = json.loads(src.read())
+        data = json.loads(src.read())
 
-    if not isinstance(obj, dict):
-        raise TypeError(f"Expected dict, got {type(obj)}")
+    try:
+        obj = aoef.AOEFObject.model_validate(data)
+    except ValidationError as e:
+        raise exceptions.DataFormatError(
+            message=(
+                "Invalid Annotation Project file. "
+                "Expected a JSON file in AOEF format."
+            ),
+            format="aoef",
+            details=str(e),
+        ) from e
 
-    if "data" not in obj:
-        raise ValueError("Missing 'data' key")
+    if obj.data.collection_type != "dataset":
+        raise exceptions.DataFormatError(
+            message=(
+                "Invalid Dataset file. "
+                "The provided file is a valid AOEF object, but it is not an "
+                "Dataset. Detected object type: "
+                f"'{obj.data.collection_type}'. "
+                "Please ensure you provided the correct file or convert it "
+                "to a Dataset."
+            ),
+            format="aoef-dataset",
+        )
+
+    dataset_object = obj.data
 
     if not dataset_dir.is_absolute():
         # Assume relative to audio_dir
@@ -42,22 +63,6 @@ async def import_dataset(
             f"Dataset directory {dataset_dir} is not relative "
             f"to audio directory {audio_dir}"
         )
-
-    data = obj["data"]
-
-    try:
-        dataset_object = aoef.DatasetObject.model_validate(data)
-    except ValidationError as error:
-        name = getattr(src, "name", None)
-        raise exceptions.DataFormatError(
-            message=(
-                "Invalid dataset object provided. Please check the "
-                "provided file."
-            ),
-            format="aoef-dataset",
-            details=str(error),
-            name=name,
-        ) from error
 
     tags = await import_tags(session, dataset_object.tags or [])
 
