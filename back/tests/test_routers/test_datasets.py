@@ -1,0 +1,249 @@
+import json
+from collections.abc import Callable
+from io import BytesIO
+from pathlib import Path, PurePosixPath, PureWindowsPath
+
+from fastapi.testclient import TestClient
+from soundevent import data
+from soundevent.io import aoef
+
+from whombat import schemas
+
+
+class TestExportDataset:
+    def test_can_export_empty_dataset(
+        self,
+        client: TestClient,
+        dataset: schemas.Dataset,
+        cookies: dict[str, str],
+    ):
+        # Download
+        response = client.get(
+            "/api/v1/datasets/detail/download/json/",
+            params={
+                "dataset_uuid": str(dataset.uuid),
+            },
+            cookies=cookies,
+        )
+        assert response.status_code == 200
+        content = aoef.AOEFObject.model_validate(response.json())
+        assert content.data.collection_type == "dataset"
+
+    def test_exported_paths_are_relative(
+        self,
+        client: TestClient,
+        dataset: schemas.Dataset,
+        dataset_dir: Path,
+        dataset_recording: schemas.Recording,
+        cookies: dict[str, str],
+    ):
+        # Download
+        response = client.get(
+            "/api/v1/datasets/detail/download/json/",
+            params={
+                "dataset_uuid": str(dataset.uuid),
+            },
+            cookies=cookies,
+        )
+        assert response.status_code == 200
+        content = aoef.AOEFObject.model_validate(response.json())
+        assert content.data.collection_type == "dataset"
+        assert len(content.data.recordings) == 1
+        assert content.data.recordings[0].uuid == dataset_recording.uuid
+
+        recording = content.data.recordings[0]
+        assert not recording.path.is_absolute()
+        assert (dataset_dir / recording.path).exists()
+
+    def test_can_import_dataset(
+        self,
+        client: TestClient,
+        dataset_dir: Path,
+        random_wav_factory: Callable[..., Path],
+        cookies: dict[str, str],
+    ):
+        recording_path = random_wav_factory(dataset_dir / "test.wav")
+        recording = data.Recording.from_file(recording_path)
+        dataset = data.Dataset(
+            name="test_dataset",
+            description="test_description",
+            recordings=[recording],
+        )
+
+        # Save to in memory file
+        dataset_file = BytesIO(
+            aoef.to_aeof(dataset).model_dump_json().encode("utf-8")
+        )
+
+        response = client.post(
+            "/api/v1/datasets/import/",
+            files={"dataset": dataset_file},
+            data={"audio_dir": str(dataset_dir)},
+            cookies=cookies,
+        )
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert response_data["name"] == "test_dataset"
+        assert response_data["description"] == "test_description"
+        assert response_data["recording_count"] == 1
+
+        # Check the recording exists
+        response = client.get(
+            "/api/v1/recordings/detail/",
+            params={
+                "recording_uuid": str(recording.uuid),
+            },
+            cookies=cookies,
+        )
+        assert response.status_code == 200
+
+    def test_can_import_dataset_with_windows_paths(
+        self,
+        client: TestClient,
+        dataset_dir: Path,
+        random_wav_factory: Callable[..., Path],
+        cookies: dict[str, str],
+    ):
+        relative_path = Path("subdir") / "test.wav"
+        recording_path = random_wav_factory(dataset_dir / relative_path)
+        recording = data.Recording.from_file(recording_path)
+
+        dataset = data.Dataset(
+            name="test_dataset",
+            description="test_description",
+            recordings=[recording],
+        )
+
+        # Save to in memory file
+        aoef_obj = aoef.to_aeof(dataset, audio_dir=dataset_dir).model_dump(
+            mode="json"
+        )
+
+        aoef_obj["data"]["recordings"][0]["path"] = str(
+            PureWindowsPath(relative_path)
+        )
+
+        dataset_file = BytesIO(json.dumps(aoef_obj).encode("utf-8"))
+
+        response = client.post(
+            "/api/v1/datasets/import/",
+            files={"dataset": dataset_file},
+            data={"audio_dir": str(dataset_dir)},
+            cookies=cookies,
+        )
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert response_data["name"] == "test_dataset"
+        assert response_data["description"] == "test_description"
+        assert response_data["recording_count"] == 1
+
+        # Check the recording exists
+        response = client.get(
+            "/api/v1/recordings/detail/",
+            params={
+                "recording_uuid": str(recording.uuid),
+            },
+            cookies=cookies,
+        )
+        assert response.status_code == 200
+
+    def test_can_import_dataset_with_posix_paths(
+        self,
+        client: TestClient,
+        dataset_dir: Path,
+        random_wav_factory: Callable[..., Path],
+        cookies: dict[str, str],
+    ):
+        relative_path = Path("subdir") / "test.wav"
+        recording_path = random_wav_factory(dataset_dir / relative_path)
+        recording = data.Recording.from_file(recording_path)
+
+        dataset = data.Dataset(
+            name="test_dataset",
+            description="test_description",
+            recordings=[recording],
+        )
+
+        # Save to in memory file
+        aoef_obj = aoef.to_aeof(dataset, audio_dir=dataset_dir).model_dump(
+            mode="json"
+        )
+
+        aoef_obj["data"]["recordings"][0]["path"] = str(
+            PurePosixPath(relative_path)
+        )
+
+        dataset_file = BytesIO(json.dumps(aoef_obj).encode("utf-8"))
+
+        response = client.post(
+            "/api/v1/datasets/import/",
+            files={"dataset": dataset_file},
+            data={"audio_dir": str(dataset_dir)},
+            cookies=cookies,
+        )
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert response_data["name"] == "test_dataset"
+        assert response_data["description"] == "test_description"
+        assert response_data["recording_count"] == 1
+
+        # Check the recording exists
+        response = client.get(
+            "/api/v1/recordings/detail/",
+            params={
+                "recording_uuid": str(recording.uuid),
+            },
+            cookies=cookies,
+        )
+        assert response.status_code == 200
+
+    def test_fails_with_invalid_aoef_format(
+        self,
+        client: TestClient,
+        dataset_dir: Path,
+        cookies: dict[str, str],
+    ):
+        file = BytesIO()
+        file.write(json.dumps({}).encode("utf-8"))
+
+        response = client.post(
+            "/api/v1/datasets/import/",
+            files={"dataset": file},
+            data={"audio_dir": str(dataset_dir)},
+            cookies=cookies,
+        )
+        assert response.status_code == 400
+        assert (
+            "Expected a JSON file in AOEF format" in response.json()["message"]
+        )
+
+    def test_fails_when_aoef_collection_type_is_mismatched(
+        self,
+        client: TestClient,
+        dataset_dir: Path,
+        cookies: dict[str, str],
+    ):
+        annotation_project = data.AnnotationProject(
+            name="test_project",
+            description="test_description",
+        )
+
+        file = BytesIO()
+        file.write(
+            aoef.to_aeof(annotation_project).model_dump_json().encode("utf-8")
+        )
+
+        response = client.post(
+            "/api/v1/datasets/import/",
+            files={"dataset": file},
+            data={"audio_dir": str(dataset_dir)},
+            cookies=cookies,
+        )
+        assert response.status_code == 400
+        assert (
+            "Detected object type: 'annotation_project'"
+            in response.json()["message"]
+        )
