@@ -10,6 +10,7 @@ import useSpectrogramSettings from "@/app/hooks/settings/useSpectrogramSettings"
 
 import RecordingSpectrogram from "@/lib/components/recordings/RecordingSpectrogram";
 
+import useViewSettings from "@/lib/hooks/settings/useViewSettings";
 import useSpectrogramAudio from "@/lib/hooks/spectrogram/useSpectrogramAudio";
 import useSpectrogramState from "@/lib/hooks/spectrogram/useSpectrogramState";
 import useClipViewport from "@/lib/hooks/window/useClipViewport";
@@ -33,9 +34,12 @@ export default function ClipEvaluationSpectrogram(
 
   const spectrogramSettings = useSpectrogramSettings();
 
+  const viewSettings = useViewSettings();
+
   const viewport = useClipViewport({
     clip,
     spectrogramSettings: spectrogramSettings.settings,
+    viewSettings: viewSettings.settings,
   });
 
   const audio = useSpectrogramAudio({
@@ -81,6 +85,7 @@ export default function ClipEvaluationSpectrogram(
             samplerate={recording.samplerate}
             audioSettings={audioSettings}
             spectrogramSettings={spectrogramSettings}
+            viewSettings={viewSettings}
           />
         ) : undefined
       }

@@ -2,8 +2,11 @@ import { useMemo } from "react";
 
 import useViewport from "@/lib/hooks/window/useViewport";
 
-import { DEFAULT_SPECTROGRAM_SETTINGS } from "@/lib/constants";
-import type { Recording, SpectrogramSettings } from "@/lib/types";
+import {
+  DEFAULT_SPECTROGRAM_SETTINGS,
+  DEFAULT_VIEW_SETTINGS,
+} from "@/lib/constants";
+import type { Recording, SpectrogramSettings, ViewSettings } from "@/lib/types";
 import { getInitialViewingWindow } from "@/lib/utils/windows";
 
 export default function useRecordingViewport({
@@ -11,11 +14,13 @@ export default function useRecordingViewport({
   startTime = 0,
   endTime,
   spectrogramSettings = DEFAULT_SPECTROGRAM_SETTINGS,
+  viewSettings = DEFAULT_VIEW_SETTINGS,
 }: {
   recording: Recording;
   startTime?: number;
   endTime?: number;
   spectrogramSettings?: SpectrogramSettings;
+  viewSettings?: ViewSettings;
 }) {
   const bounds = useMemo(
     () => ({
@@ -31,6 +36,7 @@ export default function useRecordingViewport({
     samplerate: recording.samplerate,
     windowSize: spectrogramSettings.window_size,
     overlap: spectrogramSettings.overlap,
+    viewSettings,
   });
 
   const viewport = useViewport({

@@ -34,6 +34,11 @@ export const Primary: Story = {
       channel: 0,
       speed: 1,
     },
+    viewSettings: {
+      duration: 1,
+      min_freq: 0,
+      max_freq: null,
+    },
     samplerate: 44100,
   },
 };

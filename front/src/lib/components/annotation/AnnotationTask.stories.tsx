@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import {
   DEFAULT_AUDIO_SETTINGS,
   DEFAULT_SPECTROGRAM_SETTINGS,
+  DEFAULT_VIEW_SETTINGS,
 } from "@/lib/constants";
 import type {
   AnnotationTask,
@@ -88,6 +89,7 @@ const meta: Meta<typeof AnnotationTaskComponent> = {
           <SettingsMenu
             audioSettings={DEFAULT_AUDIO_SETTINGS}
             spectrogramSettings={DEFAULT_SPECTROGRAM_SETTINGS}
+            viewSettings={DEFAULT_VIEW_SETTINGS}
             samplerate={samplerate}
           />
         }

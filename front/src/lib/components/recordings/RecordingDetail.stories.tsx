@@ -10,6 +10,7 @@ import ViewportToolbar from "@/lib/components/spectrograms/ViewportToolbar";
 import {
   DEFAULT_AUDIO_SETTINGS,
   DEFAULT_SPECTROGRAM_SETTINGS,
+  DEFAULT_VIEW_SETTINGS,
 } from "@/lib/constants";
 import {
   type Note,
@@ -97,6 +98,7 @@ export const Primary: Story = {
           <SettingsMenu
             audioSettings={DEFAULT_AUDIO_SETTINGS}
             spectrogramSettings={DEFAULT_SPECTROGRAM_SETTINGS}
+            viewSettings={DEFAULT_VIEW_SETTINGS}
             samplerate={recording.samplerate}
           />
         }

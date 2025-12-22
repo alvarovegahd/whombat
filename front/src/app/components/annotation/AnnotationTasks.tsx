@@ -3,6 +3,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 import useAudioSettings from "@/app/hooks/settings/useAudioSettings";
 import useSpectrogramSettings from "@/app/hooks/settings/useSpectrogramSettings";
+import useViewSettings from "@/app/hooks/settings/useViewSettings";
 
 import AnnotationProgress from "@/lib/components/annotation/AnnotationProgress";
 import AnnotationTaskBase from "@/lib/components/annotation/AnnotationTask";
@@ -33,6 +34,8 @@ export default function AnnotateTasks({
   const audioSettings = useAudioSettings();
 
   const spectrogramSettings = useSpectrogramSettings();
+
+  const viewSettings = useViewSettings();
 
   const tagPalette = useAnnotationTagPallete();
 
@@ -133,6 +136,7 @@ export default function AnnotateTasks({
           <ClipAnnotationSpectrogram
             clipAnnotation={tasks.annotations.data}
             audioSettings={audioSettings}
+            viewSettings={viewSettings}
             spectrogramSettings={spectrogramSettings}
             tagPalette={tagPalette}
           />
