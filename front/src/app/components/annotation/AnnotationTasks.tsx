@@ -24,9 +24,11 @@ import AnnotationTagPalette from "./AnnotationTagPalette";
 export default function AnnotateTasks({
   annotationProject,
   annotationTask,
+  onChangeTask,
 }: {
   annotationProject: AnnotationProject;
   annotationTask?: AnnotationTask;
+  onChangeTask?: (task: AnnotationTask) => void;
 }) {
   const audioSettings = useAudioSettings();
 
@@ -42,6 +44,7 @@ export default function AnnotateTasks({
   const tasks = useAnnotateTasks({
     annotationTask,
     filter,
+    onChangeTask,
   });
 
   useHotkeys("n", tasks.nextTask, {
@@ -82,6 +85,7 @@ export default function AnnotateTasks({
       }
       Progress={
         <AnnotationProgress
+          currentTask={tasks.task ?? undefined}
           tasks={tasks.tasks}
           instructions={annotationProject.annotation_instructions || ""}
           onNext={tasks.nextTask}
@@ -89,8 +93,8 @@ export default function AnnotateTasks({
           current={tasks.current}
           filter={tasks.filter}
           fixedFilterFields={["annotation_project"]}
-          onSetFilterField={tasks.setFilter}
           onClearFilterField={tasks.clearFilter}
+          onGoToTask={tasks.goToTask}
           FilterMenu={() => (
             <AnnotationTaskFilter
               filter={tasks.filter}

@@ -206,19 +206,87 @@ Now, let's explore each section of the interface in more detail.
 
 ### Navigating the Annotation Tasks
 
-At the top, you'll find an **Annotation Progress** bar (labeled **A** in the image) that provides information about the progress of annotation.
-This includes the annotation instructions, progress monitoring, and task navigation.
-To move to the next or previous task, use the arrows at the extremes of the bar.
+At the top of the interface, you'll find the **Annotation Progress** bar (labeled **A** in the image). 
+This bar provides access to annotation instructions, progress monitoring, and task navigation tools.
 
-!!! tip "Work on a subset of tasks"
+![Annotation Task Progress](../assets/img/annotation_task_progress.png)
 
-    Utilize the filter menu to focus on a specific subset of annotation tasks.
-    This feature is beneficial for team collaboration, allowing tasks to be
-    distributed based on filtering conditions. For instance, one annotator may
-    exclusively work on tasks associated with source recordings tagged as
-    "Country:Mexico," while another focuses on those tagged with "Country:Costa
-    Rica." This approach ensures annotators concentrate on priority tasks that
-    require annotation.
+#### Backward and Forward Navigation
+
+The simplest way to navigate between tasks is to move to the previous or next task.
+
+* When you assign a status to a task (see below), you are automatically advanced to the next task.
+* You can also navigate manually using the left and right arrow buttons at the ends of the bar.
+* Keyboard shortcuts are available:
+    * Press ++p++ for the previous task
+    * Press ++n++ for the next task
+
+#### Current Task
+
+The bar displays your current position in the task list.
+
+* Hover over the **Current** button to view the unique ID (UUID) of the active task.
+* Click the **Current** button to copy the task UUID to your clipboard.
+
+This allows you to save the task ID for later reference or share it with others.
+
+!!! tip "Share tasks with others"
+
+    You can share a task by copying its UUID as described above, or by copying the browser URL.
+    Users with access to the same Whombat instance (e.g., on a shared server) or the same annotation project (e.g., via export/import synchronization) can open the link and navigate directly to the task.
+
+
+!!! tip "Go to a task"
+
+    If you know a task’s UUID, you can navigate directly to it by clicking **Search**, pasting the UUID into the search bar, and pressing Enter.
+
+#### Annotation Instructions
+
+You can view the project-wide annotation instructions by clicking the **Instructions** button.
+
+* The instructions open in a small pop-up window.
+* Close the window by clicking the ✕ button or anywhere outside the pop-up.
+
+#### Annotation Progress
+
+Progress information is also displayed in the progress bar.
+It shows the proportion of tasks in each state:
+
+* **Blue**: Pending
+* **Green**: Completed
+* **Red**: Has issues
+* **Yellow**: Verified
+
+The bar also shows the number of remaining (pending) tasks.
+
+!!! note "Progress for filtered subsets"
+
+    If you apply filters to work on a subset of tasks, the progress bar reflects progress relative to the selected subset only.
+
+#### Annotation Task Map
+
+To get an overview of all annotation tasks, open the **Task Map**.
+
+* The task map opens in a modal window displaying all tasks as circular buttons.
+* Tasks are sorted by creation date.
+* Button colors indicate task status.
+* Hover over a task to view additional details.
+* Click a task to navigate directly to it.
+
+This view makes it easier to quickly find pending tasks or revisit tasks with issues.
+
+![Annotation Task Map](../assets/img/annotation_task_map.png)
+
+#### Filtering tasks
+
+Use the **Filter** menu to focus on a specific subset of annotation tasks. 
+Filtering is especially useful for collaborative workflows, as it allows tasks to be distributed based on specific criteria. 
+For example:
+
+* One annotator may work only on tasks associated with recordings tagged "Country: Mexico"
+* Another annotator may focus on tasks tagged "Country: Costa Rica"
+
+This approach helps ensure annotators focus on relevant or high-priority tasks.
 
 ### Reviewing the Task Status
 

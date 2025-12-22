@@ -18,9 +18,9 @@ export default function DetailLayout({
   Actions?: JSX.Element;
 }) {
   return (
-    <div className="flex flex-row flex-wrap gap-8 justify-between md:flex-nowrap w-100">
+    <div className="flex flex-row flex-wrap gap-8 justify-between lg:flex-nowrap w-full">
       <div className="grow">{MainContent}</div>
-      <div className="flex flex-col flex-none gap-4 max-w-sm">
+      <div className="flex flex-col flex-none gap-4 w-96">
         {Actions}
         <div className="sticky top-8 w-full">{SideBar}</div>
       </div>

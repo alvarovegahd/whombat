@@ -106,3 +106,8 @@ asyncio_mode = "auto"
 log_level = "INFO"
 addopts = "--durations=5 --disable-warnings --color=auto --code-highlight=yes"
 asyncio_default_fixture_loop_scope = "session"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.3",
+]
