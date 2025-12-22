@@ -34,10 +34,7 @@ def parse_aoef_object(src: Path | BinaryIO | str) -> AOEFObject:
             data = json.loads(src.read())
     except json.JSONDecodeError as e:
         raise exceptions.DataFormatError(
-            message=(
-                "Invalid JSON file."
-                "Expected a JSON file in AOEF format."
-            ),
+            message=("Invalid JSON file.Expected a JSON file in AOEF format."),
             format="json",
             details=str(e),
         ) from e
