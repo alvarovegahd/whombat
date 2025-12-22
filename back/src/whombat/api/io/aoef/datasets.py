@@ -1,14 +1,12 @@
-import json
 from pathlib import Path
 from typing import BinaryIO
 
-from pydantic import ValidationError
-from soundevent.io import aoef
 from sqlalchemy import tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from whombat import exceptions, models
 from whombat.api import common
+from whombat.api.io.aoef.common import parse_aoef_object
 from whombat.api.io.aoef.features import get_feature_names
 from whombat.api.io.aoef.recordings import import_recordings
 from whombat.api.io.aoef.tags import import_tags
@@ -21,23 +19,7 @@ async def import_dataset(
     dataset_dir: Path,
     audio_dir: Path,
 ) -> models.Dataset:
-    if isinstance(src, (Path, str)):
-        with open(src, "r") as file:
-            data = json.load(file)
-    else:
-        data = json.loads(src.read())
-
-    try:
-        obj = aoef.AOEFObject.model_validate(data)
-    except ValidationError as e:
-        raise exceptions.DataFormatError(
-            message=(
-                "Invalid Annotation Project file. "
-                "Expected a JSON file in AOEF format."
-            ),
-            format="aoef",
-            details=str(e),
-        ) from e
+    obj = parse_aoef_object(src)
 
     if obj.data.collection_type != "dataset":
         raise exceptions.DataFormatError(

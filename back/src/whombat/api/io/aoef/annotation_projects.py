@@ -1,10 +1,8 @@
 import datetime
-import json
 from pathlib import Path
 from typing import BinaryIO
 
-from pydantic import ValidationError
-from soundevent.io.aoef import AnnotationProjectObject, AOEFObject
+from soundevent.io.aoef import AnnotationProjectObject
 from sqlalchemy import select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +11,7 @@ from whombat.api.common import utils
 from whombat.api.io.aoef.annotation_tasks import get_annotation_tasks
 from whombat.api.io.aoef.clip_annotations import get_clip_annotations
 from whombat.api.io.aoef.clips import get_clips
+from whombat.api.io.aoef.common import parse_aoef_object
 from whombat.api.io.aoef.features import get_feature_names
 from whombat.api.io.aoef.recordings import get_recordings
 from whombat.api.io.aoef.sound_event_annotations import (
@@ -31,23 +30,7 @@ async def import_annotation_project(
     base_audio_dir: Path,
     imported_by: SimpleUser,
 ) -> models.AnnotationProject:
-    if isinstance(src, (Path, str)):
-        with open(src, "r") as file:
-            data = json.load(file)
-    else:
-        data = json.loads(src.read())
-
-    try:
-        obj = AOEFObject.model_validate(data)
-    except ValidationError as e:
-        raise exceptions.DataFormatError(
-            message=(
-                "Invalid Annotation Project file. "
-                "Expected a JSON file in AOEF format."
-            ),
-            format="aoef",
-            details=str(e),
-        ) from e
+    obj = parse_aoef_object(src)
 
     if obj.data.collection_type != "annotation_project":
         raise exceptions.DataFormatError(
