@@ -31,7 +31,7 @@ You can also navigate by scrolling.
 Just hover your mouse over the spectrogram or the bar at the bottom, then use your scroll wheel:
 
 - Scroll up and down: Move vertically through frequencies.
-    Most likely you won't see any changes as the default behaviour is to display the full frequency range.
+  Most likely you won't see any changes as the default behaviour is to display the full frequency range.
 - Ctrl + Scroll: Move horizontally through time.
 
 Zooming is just as easy:
@@ -88,6 +88,9 @@ Here's a breakdown of each setting:
 | Normalize Amplitude | Enable this to adjust the amplitude values to a 0-1 range. Useful for making quiet recordings easier to see.                                                                |
 | Min Amplitude       | Set the minimum amplitude (in decibels) to display. Values below this are set to the minimum and assigned the corresponding color. This can help reduce noise.              |
 | Max Amplitude       | Set the maximum amplitude (in decibels) to display. Values above this are set to the maximum and assigned the corresponding color. This can help highlight specific sounds. |
+| Duration            | Set the default time duration of the spectrogram window when it is first displayed.                                                                                         |
+| Min Frequency       | Set the default lower frequency limit (in Hz) for the initial spectrogram view. Users can freely navigate beyond this range after loading.                                  |
+| Max Frequency       | Set the default upper frequency limit (in Hz) for the initial spectrogram view. Users can freely navigate beyond this range after loading.                                  |
 
 ## Audio Player
 
