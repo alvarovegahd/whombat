@@ -16,6 +16,7 @@ import Empty from "@/lib/components/ui/Empty";
 
 import useAnnotationState from "@/lib/hooks/annotation/useAnnotationState";
 import useAnnotationTagPallete from "@/lib/hooks/annotation/useAnnotationTagPalette";
+import useViewSettings from "@/lib/hooks/settings/useViewSettings";
 import useSpectrogramAudio from "@/lib/hooks/spectrogram/useSpectrogramAudio";
 import useSpectrogramState from "@/lib/hooks/spectrogram/useSpectrogramState";
 import useClipViewport from "@/lib/hooks/window/useClipViewport";
@@ -26,12 +27,14 @@ export default function ClipAnnotationSpectrogram({
   clipAnnotation,
   spectrogramSettings,
   audioSettings,
+  viewSettings,
   tagPalette,
   height,
 }: {
   clipAnnotation: ClipAnnotation;
   spectrogramSettings: ReturnType<typeof useSpectrogramSettings>;
   audioSettings: ReturnType<typeof useAudioSettings>;
+  viewSettings: ReturnType<typeof useViewSettings>;
   tagPalette: ReturnType<typeof useAnnotationTagPallete>;
   height?: number;
 }) {
@@ -47,6 +50,7 @@ export default function ClipAnnotationSpectrogram({
   const viewport = useClipViewport({
     clip: data.clip,
     spectrogramSettings: spectrogramSettings.settings,
+    viewSettings: viewSettings.settings,
   });
 
   const audio = useSpectrogramAudio({
@@ -81,6 +85,7 @@ export default function ClipAnnotationSpectrogram({
           samplerate={data.clip.recording.samplerate}
           audioSettings={audioSettings}
           spectrogramSettings={spectrogramSettings}
+          viewSettings={viewSettings}
         />
       }
       ViewportBar={<ViewportBar viewport={viewport} />}
