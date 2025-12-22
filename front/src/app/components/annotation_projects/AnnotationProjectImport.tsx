@@ -45,6 +45,7 @@ export default function AnnotationProjectImport({
               onCopy={() => {
                 copyErrorToClipboard(error);
                 toast.dismiss("import-annotation-project");
+                toast.success("Copied error to clipboard");
               }}
             />
           ),
@@ -68,6 +69,10 @@ export default function AnnotationProjectImport({
             message="Error importing annotation project"
             error={importError}
             onClose={() => setImportError(null)}
+            onCopy={() => {
+              copyErrorToClipboard(importError);
+              toast.success("Copied error to clipboard");
+            }}
           />
         </Portal>
       )}
