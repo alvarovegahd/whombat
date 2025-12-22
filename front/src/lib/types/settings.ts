@@ -11,3 +11,5 @@ export type AudioSettings = z.infer<typeof schemas.AudioSettingsSchema>;
 export type SpectrogramSettings = z.infer<
   typeof schemas.SpectrogramSettingsSchema
 >;
+
+export type ViewSettings = z.infer<typeof schemas.ViewSettingsSchema>;
