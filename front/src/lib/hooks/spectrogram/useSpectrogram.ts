@@ -13,6 +13,7 @@ import type {
   Recording,
   SpectrogramSettings,
   SpectrogramWindow,
+  ViewSettings,
 } from "@/lib/types";
 import { scaleTimeToViewport } from "@/lib/utils/geometry";
 import { getInitialViewingWindow } from "@/lib/utils/windows";
@@ -22,11 +23,13 @@ export default function useSpectrogram({
   bounds,
   audioSettings,
   spectrogramSettings,
+  viewSettings,
 }: {
   recording: Recording;
   bounds: SpectrogramWindow;
   audioSettings: AudioSettings;
   spectrogramSettings: SpectrogramSettings;
+  viewSettings?: ViewSettings;
 }) {
   const state = useSpectrogramState();
 
@@ -36,6 +39,7 @@ export default function useSpectrogram({
     samplerate: recording.samplerate,
     windowSize: spectrogramSettings.window_size,
     overlap: spectrogramSettings.overlap,
+    viewSettings,
   });
 
   const viewport = useViewport({
