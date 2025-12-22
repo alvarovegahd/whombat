@@ -1,4 +1,50 @@
-import type { AnnotationTask } from "@/lib/types";
+import type { AnnotationStatus, AnnotationTask } from "@/lib/types";
+
+export function getAnnotationTaskStatus(
+  task: AnnotationTask,
+): AnnotationStatus | "pending" {
+  let status_badges = task.status_badges;
+
+  if (status_badges == null) {
+    return "pending";
+  }
+
+  if (status_badges.length === 0) {
+    return "pending";
+  }
+
+  let isVerified = false;
+  let isCompleted = false;
+  let needsReview = false;
+
+  status_badges.forEach(({ state }) => {
+    switch (state) {
+      case "verified":
+        isVerified = true;
+        break;
+      case "rejected":
+        needsReview = true;
+        break;
+      case "completed":
+        isCompleted = true;
+        break;
+    }
+  });
+
+  if (needsReview) {
+    return "rejected";
+  }
+
+  if (isVerified) {
+    return "verified";
+  }
+
+  if (isCompleted) {
+    return "completed";
+  }
+
+  return "pending";
+}
 
 export function computeAnnotationTasksProgress(
   annotationTasks: AnnotationTask[],
