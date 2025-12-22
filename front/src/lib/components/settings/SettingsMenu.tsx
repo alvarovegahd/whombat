@@ -3,27 +3,36 @@ import { useState } from "react";
 import { SettingsIcon } from "@/lib/components/icons";
 import AudioSettingsComponent from "@/lib/components/settings/AudioSettings";
 import SpectrogramSettingsComponent from "@/lib/components/settings/SpectrogramSettings";
+import ViewSettingsComponent from "@/lib/components/settings/ViewSettings";
 import Button from "@/lib/components/ui/Button";
 import { H3 } from "@/lib/components/ui/Headings";
 import SlideOver from "@/lib/components/ui/SlideOver";
 import Tooltip from "@/lib/components/ui/Tooltip";
 
-import type { AudioSettings, SpectrogramSettings } from "@/lib/types";
+import type {
+  AudioSettings,
+  SpectrogramSettings,
+  ViewSettings,
+} from "@/lib/types";
 
 export default function SettingsMenu({
   audioSettings,
   spectrogramSettings,
+  viewSettings,
   samplerate,
   onAudioSettingsChange,
   onSpectrogramSettingsChange,
+  onViewSettingsChange,
   onResetSettings,
   onSaveSettings,
 }: {
   audioSettings: AudioSettings;
   spectrogramSettings: SpectrogramSettings;
+  viewSettings: ViewSettings;
   samplerate: number;
   onAudioSettingsChange?: (settings: AudioSettings) => void;
   onSpectrogramSettingsChange?: (settings: SpectrogramSettings) => void;
+  onViewSettingsChange?: (settings: ViewSettings) => void;
   onResetSettings?: () => void;
   onSaveSettings?: () => void;
 }) {
@@ -67,6 +76,12 @@ export default function SettingsMenu({
             samplerate={samplerate}
             settings={spectrogramSettings}
             onChange={onSpectrogramSettingsChange}
+          />
+          <H3>View</H3>
+          <ViewSettingsComponent
+            samplerate={samplerate}
+            settings={viewSettings}
+            onChange={onViewSettingsChange}
           />
         </div>
       </SlideOver>
