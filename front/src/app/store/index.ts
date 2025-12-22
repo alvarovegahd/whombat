@@ -8,12 +8,14 @@ import { type ClipboardSlice, createClipboardSlice } from "./clipboard";
 import { type ColorsSlice, createColorsSlice } from "./colors";
 import { type SessionSlice, createSessionSlice } from "./session";
 import { type SpectrogramSlice, createSpectrogramSlice } from "./spectrogram";
+import { type ViewSlice, createViewSlice } from "./view";
 
 type Store = SessionSlice &
   ClipboardSlice &
   ColorsSlice &
   SpectrogramSlice &
-  AudioSlice;
+  AudioSlice &
+  ViewSlice;
 
 const useStore = create<Store>()(
   persist(
@@ -23,6 +25,7 @@ const useStore = create<Store>()(
       ...createColorsSlice(...a),
       ...createSpectrogramSlice(...a),
       ...createAudioSlice(...a),
+      ...createViewSlice(...a),
     }),
     {
       name: "whombat-storage",
