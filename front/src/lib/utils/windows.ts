@@ -1,6 +1,7 @@
 import {
   DEFAULT_OVERLAP,
   DEFAULT_SPECTROGRAM_SETTINGS,
+  DEFAULT_VIEW_SETTINGS,
   DEFAULT_WINDOW_SIZE,
 } from "@/lib/constants";
 import type {
@@ -10,6 +11,7 @@ import type {
   Recording,
   SpectrogramSettings,
   SpectrogramWindow,
+  ViewSettings,
 } from "@/lib/types";
 
 import { computeGeometryBBox } from "./geometry";
@@ -29,22 +31,32 @@ export function getInitialViewingWindow({
   samplerate,
   windowSize,
   overlap,
+  viewSettings = DEFAULT_VIEW_SETTINGS,
 }: {
   startTime: number;
   endTime: number;
   samplerate: number;
   windowSize: number;
   overlap: number;
+  viewSettings?: ViewSettings;
 }): SpectrogramWindow {
-  const duration = getInitialDuration({
-    interval: { min: startTime, max: endTime },
-    samplerate,
-    windowSize: windowSize,
-    overlap,
-  });
+  let duration = viewSettings.duration;
+
+  if (duration == null) {
+    duration = getInitialDuration({
+      interval: { min: startTime, max: endTime },
+      samplerate,
+      windowSize: windowSize,
+      overlap,
+    });
+  }
+
+  let minFreq = viewSettings.min_freq ?? 0;
+  let maxFreq = viewSettings.max_freq ?? samplerate / 2;
+
   return {
     time: { min: startTime, max: startTime + duration },
-    freq: { min: 0, max: samplerate / 2 },
+    freq: { min: minFreq, max: maxFreq },
   };
 }
 

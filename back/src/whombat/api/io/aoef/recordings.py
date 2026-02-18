@@ -1,5 +1,5 @@
 import logging
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from uuid import UUID
 
 from soundevent.audio import compute_md5_checksum
@@ -389,10 +389,13 @@ def check_recording(
     """Check if a recording is valid."""
     path = recording.path
 
-    if not path.is_absolute():
-        path = audio_dir / path
+    if path.is_absolute() and not path.exists():
+        logger.warning(f"Recording file {path} not found")
+        return False
 
-    if not path.is_file():
+    path = check_multi_platform_path(path, audio_dir)
+
+    if not path:
         logger.warning(f"Recording file {path} not found")
         return False
 
@@ -403,6 +406,16 @@ def check_recording(
         return False
 
     return True
+
+
+def check_multi_platform_path(path: Path, audio_dir: Path) -> Path | None:
+    if (audio_dir / path).exists():
+        return (audio_dir / path).resolve()
+
+    windows_path = PureWindowsPath(str(path))
+    converted = audio_dir.joinpath(*windows_path.parts)
+    if converted.exists():
+        return converted.resolve()
 
 
 def normalize_audio_path(

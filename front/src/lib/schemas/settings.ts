@@ -5,6 +5,9 @@ import {
   DEFAULT_FILTER_ORDER,
   DEFAULT_OVERLAP,
   DEFAULT_SCALE,
+  DEFAULT_VIEW_DURATION,
+  DEFAULT_VIEW_MAX_FREQ,
+  DEFAULT_VIEW_MIN_FREQ,
   DEFAULT_WINDOW,
   DEFAULT_WINDOW_SIZE,
   MAX_SAMPLERATE,
@@ -160,3 +163,9 @@ export const SpectrogramParametersSchema = z
       path: ["min_dB"],
     },
   );
+
+export const ViewSettingsSchema = z.object({
+  duration: z.coerce.number().positive().default(DEFAULT_VIEW_DURATION),
+  min_freq: z.number().nonnegative().nullable().default(DEFAULT_VIEW_MIN_FREQ),
+  max_freq: z.number().nonnegative().nullable().default(DEFAULT_VIEW_MAX_FREQ),
+});

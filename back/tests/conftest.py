@@ -264,11 +264,13 @@ async def recording(
     audio_dir: Path,
 ) -> schemas.Recording:
     """Create a recording for testing."""
-    return await api.recordings.create(
+    recording = await api.recordings.create(
         session,
         path=random_wav_factory(),
         audio_dir=audio_dir,
     )
+    await session.commit()
+    return recording
 
 
 @pytest.fixture
@@ -277,12 +279,14 @@ async def clip(
     recording: schemas.Recording,
 ) -> schemas.Clip:
     """Create a clip for testing."""
-    return await api.clips.create(
+    clip = await api.clips.create(
         session,
         recording=recording,
         start_time=0.1,
         end_time=0.2,
     )
+    await session.commit()
+    return clip
 
 
 @pytest.fixture
@@ -301,11 +305,13 @@ async def sound_event(
             ]
         ]
     )
-    return await api.sound_events.create(
+    sound_event = await api.sound_events.create(
         session,
         recording=recording,
         geometry=geometry,
     )
+    await session.commit()
+    return sound_event
 
 
 @pytest.fixture
@@ -320,13 +326,15 @@ async def dataset(
     session: AsyncSession, audio_dir: Path, dataset_dir: Path
 ) -> schemas.Dataset:
     """Create a dataset for testing."""
-    return await api.datasets.create(
+    dataset = await api.datasets.create(
         session,
         name="test_dataset",
         description="test_description",
         dataset_dir=dataset_dir,
         audio_dir=audio_dir,
     )
+    await session.commit()
+    return dataset
 
 
 @pytest.fixture
@@ -343,6 +351,7 @@ async def dataset_recording(
         audio_dir=audio_dir,
     )
     await api.datasets.add_recording(session, dataset, recording)
+    await session.commit()
     return recording
 
 
@@ -368,12 +377,14 @@ async def sound_event_annotation(
     user: schemas.SimpleUser,
 ) -> schemas.SoundEventAnnotation:
     """Create a sound event annotation for testing."""
-    return await api.sound_event_annotations.create(
+    sound_event_annotation = await api.sound_event_annotations.create(
         session,
         clip_annotation=clip_annotation,
         sound_event=sound_event,
         created_by=user,
     )
+    await session.commit()
+    return sound_event_annotation
 
 
 @pytest.fixture
@@ -381,12 +392,14 @@ async def annotation_project(
     session: AsyncSession,
 ) -> schemas.AnnotationProject:
     """Create an annotation project for testing."""
-    return await api.annotation_projects.create(
+    annotation_project = await api.annotation_projects.create(
         session,
         name="test_annotation_project",
         description="test_description",
         annotation_instructions="test_instructions",
     )
+    await session.commit()
+    return annotation_project
 
 
 @pytest.fixture
@@ -397,12 +410,14 @@ async def annotation_task(
     clip_annotation: schemas.ClipAnnotation,
 ) -> schemas.AnnotationTask:
     """Create a task for testing."""
-    return await api.annotation_tasks.create(
+    annotation_task = await api.annotation_tasks.create(
         session,
         annotation_project=annotation_project,
         clip=clip,
         clip_annotation_id=clip_annotation.id,
     )
+    await session.commit()
+    return annotation_task
 
 
 @pytest.fixture
@@ -411,10 +426,12 @@ async def clip_prediction(
     clip: schemas.Clip,
 ) -> schemas.ClipPrediction:
     """Create a clip prediction for testing."""
-    return await api.clip_predictions.create(
+    clip_prediction = await api.clip_predictions.create(
         session,
         clip=clip,
     )
+    await session.commit()
+    return clip_prediction
 
 
 @pytest.fixture
@@ -424,12 +441,14 @@ async def sound_event_prediction(
     clip_prediction: schemas.ClipPrediction,
 ) -> schemas.SoundEventPrediction:
     """Create a sound event prediction for testing."""
-    return await api.sound_event_predictions.create(
+    sound_event_prediction = await api.sound_event_predictions.create(
         session,
         clip_prediction=clip_prediction,
         sound_event=sound_event,
         score=0.5,
     )
+    await session.commit()
+    return sound_event_prediction
 
 
 @pytest.fixture
@@ -437,12 +456,14 @@ async def model_run(
     session: AsyncSession,
 ) -> schemas.ModelRun:
     """Create a model run for testing."""
-    return await api.model_runs.create(
+    model_run = await api.model_runs.create(
         session,
         name="test_model",
         version="0.0.0",
         description="test_description",
     )
+    await session.commit()
+    return model_run
 
 
 @pytest.fixture
@@ -451,10 +472,12 @@ async def user_run(
     user: schemas.SimpleUser,
 ) -> schemas.UserRun:
     """Create a user run for testing."""
-    return await api.user_runs.create(
+    user_run = await api.user_runs.create(
         session,
         user=user,
     )
+    await session.commit()
+    return user_run
 
 
 @pytest.fixture
@@ -462,11 +485,13 @@ async def evaluation(
     session: AsyncSession,
 ) -> schemas.Evaluation:
     """Create an evaluation for testing."""
-    return await api.evaluations.create(
+    evaluation = await api.evaluations.create(
         session,
         score=0.5,
         task="clip_classification",
     )
+    await session.commit()
+    return evaluation
 
 
 @pytest.fixture
@@ -477,13 +502,15 @@ async def clip_evaluation(
     clip_annotation: schemas.ClipAnnotation,
 ) -> schemas.ClipEvaluation:
     """Create a clip evaluation for testing."""
-    return await api.clip_evaluations.create(
+    clip_evaluation = await api.clip_evaluations.create(
         session,
         evaluation=evaluation,
         clip_prediction=clip_prediction,
         clip_annotation=clip_annotation,
         score=0.7,
     )
+    await session.commit()
+    return clip_evaluation
 
 
 @pytest.fixture
@@ -494,7 +521,7 @@ async def sound_event_evaluation(
     sound_event_annotation: schemas.SoundEventAnnotation,
 ) -> schemas.SoundEventEvaluation:
     """Create a sound event evaluation for testing."""
-    return await api.sound_event_evaluations.create(
+    sound_event_evaluation = await api.sound_event_evaluations.create(
         session,
         clip_evaluation=clip_evaluation,
         source=sound_event_prediction,
@@ -502,6 +529,8 @@ async def sound_event_evaluation(
         affinity=1,
         score=0.7,
     )
+    await session.commit()
+    return sound_event_evaluation
 
 
 @pytest.fixture
@@ -509,8 +538,10 @@ async def evaluation_set(
     session: AsyncSession,
 ) -> schemas.EvaluationSet:
     """Create an evaluation set for testing."""
-    return await api.evaluation_sets.create(
+    evaluation_set = await api.evaluation_sets.create(
         session,
         name="test_evaluation_set",
         description="test_description",
     )
+    await session.commit()
+    return evaluation_set

@@ -1,22 +1,14 @@
+import json
+from pathlib import Path
+from typing import BinaryIO
 from uuid import UUID
 
-from soundevent.io.aoef import (
-    AnnotationSetObject,
-    EvaluationObject,
-    PredictionSetObject,
-    RecordingSetObject,
-)
+from pydantic import ValidationError
+from soundevent.io.aoef import AOEFObject
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from whombat import models
-
-AOEFObject = (
-    EvaluationObject
-    | AnnotationSetObject
-    | PredictionSetObject
-    | RecordingSetObject
-)
+from whombat import exceptions, models
 
 
 async def get_mapping(
@@ -31,3 +23,32 @@ async def get_mapping(
     stmt = select(model.id, model.uuid).where(model.uuid.in_(values))  # type: ignore
     result = await session.execute(stmt)
     return {r[1]: r[0] for r in result.all()}
+
+
+def parse_aoef_object(src: Path | BinaryIO | str) -> AOEFObject:
+    try:
+        if isinstance(src, (Path, str)):
+            with open(src, "r") as file:
+                data = json.load(file)
+        else:
+            data = json.loads(src.read())
+    except json.JSONDecodeError as e:
+        raise exceptions.DataFormatError(
+            message=("Invalid JSON file.Expected a JSON file in AOEF format."),
+            format="json",
+            details=str(e),
+        ) from e
+
+    try:
+        obj = AOEFObject.model_validate(data)
+    except ValidationError as e:
+        raise exceptions.DataFormatError(
+            message=(
+                "Invalid Annotation Project file. "
+                "Expected a JSON file in AOEF format."
+            ),
+            format="aoef",
+            details=str(e),
+        ) from e
+
+    return obj

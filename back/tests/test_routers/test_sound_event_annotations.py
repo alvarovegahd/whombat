@@ -24,3 +24,14 @@ async def test_can_create_a_sound_event_annotation(
     )
 
     assert response.status_code == 200
+
+    # Get the annotation
+    response = client.get(
+        "/api/v1/sound_event_annotations/",
+        cookies=cookies,
+    )
+    assert response.status_code == 200
+    obj = response.json()
+    assert obj["total"] == 1
+    item = obj["items"][0]
+    assert item["sound_event"]["geometry"]["coordinates"] == [0, 1000, 1, 2000]

@@ -5,7 +5,7 @@ import { ToastIcon, Toaster, resolveValue } from "react-hot-toast";
 
 export default function Notification() {
   return (
-    <Toaster position="top-right">
+    <Toaster position="top-right" containerClassName="z-[9999]">
       {(t) => (
         <Transition
           appear

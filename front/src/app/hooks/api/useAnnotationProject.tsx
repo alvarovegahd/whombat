@@ -88,11 +88,7 @@ export default function useAnnotationProject({
   });
 
   const download = useCallback(async () => {
-    await toast.promise(api.annotationProjects.download(uuid), {
-      loading: "Downloading...",
-      success: "Download complete",
-      error: "Failed to download dataset",
-    });
+    return api.annotationProjects.download(uuid);
   }, [uuid]);
 
   return {

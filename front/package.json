@@ -1,6 +1,6 @@
 {
   "name": "whombat-front",
-  "version": "0.8.5",
+  "version": "0.8.8",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -96,6 +96,8 @@
     "storybook": "^8.2.9",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "ts-prune": "^0.10.3"
+    "ts-prune": "^0.10.3",
+    "typescript-language-server": "^4.3.4",
+    "webpack": "^5.101.2"
   }
 }

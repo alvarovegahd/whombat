@@ -23,6 +23,7 @@ export const Empty: Story = {
 
 export const Pending: Story = {
   args: {
+    current: 0,
     filter: {},
     tasks: [
       {
@@ -42,6 +43,7 @@ export const Pending: Story = {
 
 export const WithCompleted: Story = {
   args: {
+    current: 0,
     filter: {},
     tasks: [
       {
@@ -61,6 +63,7 @@ export const WithCompleted: Story = {
 
 export const WithRejected: Story = {
   args: {
+    current: 0,
     filter: {},
     tasks: [
       {
@@ -80,6 +83,7 @@ export const WithRejected: Story = {
 
 export const WithVerified: Story = {
   args: {
+    current: 0,
     filter: {},
     tasks: [
       {
@@ -99,6 +103,7 @@ export const WithVerified: Story = {
 
 export const PendingOnly: Story = {
   args: {
+    current: 0,
     filter: {
       pending: true,
     },
@@ -120,6 +125,7 @@ export const PendingOnly: Story = {
 
 export const IssuesOnly: Story = {
   args: {
+    current: 0,
     filter: {
       rejected: true,
     },
@@ -163,6 +169,7 @@ export const FixedDataset: Story = {
         created_on: new Date(),
       } as AnnotationTask,
     ],
+    current: 0,
     fixedFilterFields: ["dataset"],
     instructions: "Annotation instructions",
   },

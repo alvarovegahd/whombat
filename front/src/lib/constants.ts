@@ -3,6 +3,7 @@ import type {
   AudioSettings,
   SpectrogramParameters,
   SpectrogramSettings,
+  ViewSettings,
 } from "@/lib/types";
 
 /* Default values for the settings of the STFT computation
@@ -16,6 +17,11 @@ export const DEFAULT_WINDOW = "hann";
 export const DEFAULT_SCALE = "dB";
 export const DEFAULT_FILTER_ORDER = 5;
 export const DEFAULT_CMAP = "plasma";
+
+/* Default settings for windows (viewing windows) */
+export const DEFAULT_VIEW_DURATION = 1;
+export const DEFAULT_VIEW_MIN_FREQ: number | null = 0;
+export const DEFAULT_VIEW_MAX_FREQ: number | null = null;
 
 /* Restrictions on the settings for the STFT computation
  * These are to prevent the user from setting parameters that
@@ -50,6 +56,12 @@ export const DEFAULT_SPECTROGRAM_SETTINGS: SpectrogramSettings = {
   normalize: true,
   pcen: false,
   cmap: DEFAULT_CMAP,
+};
+
+export const DEFAULT_VIEW_SETTINGS: ViewSettings = {
+  duration: 1,
+  min_freq: 0,
+  max_freq: null,
 };
 
 export const DEFAULT_SPECTROGRAM_PARAMETERS: SpectrogramParameters = {

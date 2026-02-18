@@ -5,6 +5,7 @@ import ClipAnnotationSpectrogram from "@/lib/components/clip_annotations/ClipAnn
 import {
   DEFAULT_AUDIO_SETTINGS,
   DEFAULT_SPECTROGRAM_SETTINGS,
+  DEFAULT_VIEW_SETTINGS,
 } from "@/lib/constants";
 import type { SpectrogramWindow } from "@/lib/types";
 
@@ -64,6 +65,7 @@ export const Primary: Story = {
       <SettingsMenu
         audioSettings={DEFAULT_AUDIO_SETTINGS}
         spectrogramSettings={DEFAULT_SPECTROGRAM_SETTINGS}
+        viewSettings={DEFAULT_VIEW_SETTINGS}
         samplerate={samplerate}
       />
     ),

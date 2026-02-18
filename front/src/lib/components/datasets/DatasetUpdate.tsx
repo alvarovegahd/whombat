@@ -31,7 +31,7 @@ export default function DatasetUpdateComponent({
           <div className="py-6 px-4 sm:px-0">
             <Description
               name="Description"
-              value={dataset.description}
+              value={dataset.description || ""}
               onChange={(description) => onChangeDataset?.({ description })}
               type="textarea"
               editable

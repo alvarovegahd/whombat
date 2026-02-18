@@ -14,6 +14,7 @@ import Error from "@/app/error";
 import ClipAnnotationSpectrogramBase from "@/lib/components/clip_annotations/ClipAnnotationSpectrogram";
 import Loading from "@/lib/components/ui/Loading";
 
+import useViewSettings from "@/lib/hooks/settings/useViewSettings";
 import useSpectrogramAudio from "@/lib/hooks/spectrogram/useSpectrogramAudio";
 import useSpectrogramState from "@/lib/hooks/spectrogram/useSpectrogramState";
 import useSoundEventViewport from "@/lib/hooks/window/useSoundEventViewport";
@@ -76,6 +77,8 @@ function Inner({
 
   const spectrogramSettings = useSpectrogramSettings();
 
+  const viewSettings = useViewSettings();
+
   const spectrogramState = useSpectrogramState();
 
   const viewport = useSoundEventViewport({
@@ -120,6 +123,7 @@ function Inner({
             samplerate={recording.samplerate}
             audioSettings={audioSettings}
             spectrogramSettings={spectrogramSettings}
+            viewSettings={viewSettings}
           />
         ) : undefined
       }
